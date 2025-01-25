@@ -29,6 +29,19 @@ _TODO: Show your game to the world, animated GIFs recommended!._
 
  - Ciro Durán - [https://www.ciroduran.com/links](https://www.ciroduran.com/links)
 
+### Instructions for getting a dev environment
+
+This game uses raylib 5.5, download raylib 5.5, install on C:\raylib, or just install it directly on src\. The final result is that the src directory should look like this:
+
+ - `src\cannonbubble` (This already exists)
+ - `src\emsdk`
+ - `src\npp`
+ - `src\raylib`
+ - `src\w64devkit`
+ - `src\README.txt`
+
+Then use Visual Studio 2022 to open `src\raylib\cannonbubble\projects\VS2022\cannonbubble.sln` and have fun tinkering!
+
 ### Links
 
  - YouTube Gameplay: $(YouTube Link)

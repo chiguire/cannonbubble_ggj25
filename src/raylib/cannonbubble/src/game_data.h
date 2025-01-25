@@ -14,17 +14,22 @@ extern "C" {            // Prevents name mangling of functions
 typedef struct mball MBall;
 
 struct mball {
-	Vector2 pos;
+	Vector2 pos; // Relative to bubble pos
 	float size;
 };
+
+void InitBall(MBall* ball);
 
 typedef struct bubble Bubble;
 
 struct bubble {
+	Vector2 pos;
 	MBall balls[MAX_BALLS];
 	bool active_balls[MAX_BALLS];
 };
 
+void InitBubble(Bubble* bubble);
+void AddBallToBubble(Bubble* bubble, Vector2 pos, float size);
 void TickBubble(Bubble* bubble);
 bool IsBubbleAlive(const Bubble* bubble);
 
@@ -37,6 +42,9 @@ struct gamestate {
 
 void InitGameState(GameState* gameState);
 void TickGameState(GameState* gameState);
+
+int FindNextAvailableBubble(GameState* gameState);
+void CreateBubble(GameState* gameState);
 
 #ifdef __cplusplus
 }
