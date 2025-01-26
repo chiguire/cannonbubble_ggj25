@@ -378,7 +378,7 @@
     <ResourceCompile Include="..\..\..\src\raylib_game.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\resources\shaders\glsl330\metaball.fs" />
+    <None Include="..\..\..\src\resources\shaders\glsl330\metaball.fs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

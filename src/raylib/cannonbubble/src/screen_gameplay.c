@@ -24,8 +24,10 @@
 **********************************************************************************************/
 
 #include "raylib.h"
+#include "raymath.h"
 #include "screens.h"
 #include "game_data.h"
+#include <math.h>
 
 #if defined(PLATFORM_DESKTOP)
 #define GLSL_VERSION            330
@@ -47,8 +49,19 @@ GameState gameState = { 0 };
 
 Camera camera = { 0 };
 Shader shader = { 0 };
-float swirlCenter[2] = { 0, 0 };
-int swirlCenterLoc = -1;
+
+int iTimeDeltaLoc = 0;
+float frameTime = 0.0f;
+
+int ballsPosLoc = 0;
+Vector2 ballsPos[4] = { { -50, -50 }, { 40, -50 }, { 40, 60 }, { -60, 55 } };
+
+int ballsRadiusLoc = 0;
+float ballsRadius[4] = { 15, 20, 25, 12 };
+
+int ballsHowManyLoc = 0;
+int ballsHowMany = 4;
+
 RenderTexture2D target = { 0 };
 
 //----------------------------------------------------------------------------------
@@ -64,17 +77,19 @@ void InitGameplayScreen(void)
 
     InitGameState(&gameState);
 
-    shader = LoadShader(0, TextFormat("resources/shaders/glsl%i/metaball.fs", GLSL_VERSION));
+    shader = LoadShader(0, TextFormat("resources/shaders/glsl%i/metaball.fs.glsl", GLSL_VERSION));
 
     // Get variable (uniform) location on the shader to connect with the program
     // NOTE: If uniform variable could not be found in the shader, function returns -1
-    swirlCenterLoc = GetShaderLocation(shader, "center");
+    iTimeDeltaLoc = GetShaderLocation(shader, "iTimeDelta");
+    frameTime = 0.0f;
+
+    ballsPosLoc = GetShaderLocation(shader, "ballsPos");
+    
+    ballsRadiusLoc = GetShaderLocation(shader, "ballsRadius");
 
     screenWidth = GetScreenWidth();
     screenHeight = GetScreenHeight();
-
-    swirlCenter[0] = (float)screenWidth / 2;
-    swirlCenter[1] = (float)screenHeight / 2;
 
     // Create a RenderTexture2D to be used for render to texture
     target = LoadRenderTexture(screenWidth, screenHeight);
@@ -86,33 +101,38 @@ void UpdateGameplayScreen(void)
     // TODO: Update GAMEPLAY screen variables here!
     TickGameState(&gameState);
 
+    ballsPos[0] = Vector2Add((Vector2) { -50 , -50 }, (Vector2) { cosf(frameTime), sinf(frameTime) });
+    ballsPos[1] = Vector2Add((Vector2) { 40, -50 }, (Vector2) { cosf(frameTime*2), -sinf(frameTime) });
+    ballsPos[2] = Vector2Add((Vector2) { 40, 60 }, (Vector2) { -cosf(frameTime), sinf(frameTime*2) });
+    ballsPos[3] = Vector2Add((Vector2) { -60, 55 }, (Vector2) { -cosf(frameTime*3), -sinf(frameTime*2) });
+
     // Press enter or tap to change to ENDING screen
     if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
     {
         finishScreen = 1;
         PlaySound(fxCoin);
     }
+    frameTime += GetFrameTime();
 }
 
 // Gameplay Screen Draw logic
 void DrawGameplayScreen(void)
 {
+    // METABALL RENDERING
     // Send new value to the shader to be used on drawing
-    SetShaderValue(shader, swirlCenterLoc, swirlCenter, SHADER_UNIFORM_VEC2);
-    //----------------------------------------------------------------------------------
+    SetShaderValue(shader, iTimeDeltaLoc, &frameTime, SHADER_UNIFORM_FLOAT);
+    SetShaderValueV(shader, ballsPosLoc, ballsPos, SHADER_UNIFORM_VEC2, 4);
+    SetShaderValueV(shader, ballsRadiusLoc, ballsRadius, SHADER_UNIFORM_VEC2, 4);
+    SetShaderValue(shader, ballsHowManyLoc, &ballsHowMany, SHADER_UNIFORM_INT);
 
+    //----------------------------------------------------------------------------------
     // Draw
     //----------------------------------------------------------------------------------
     BeginTextureMode(target);       // Enable drawing to texture
-    ClearBackground(RAYWHITE);  // Clear texture background
-
-    BeginMode3D(camera);        // Begin 3d mode drawing
-    DrawGrid(10, 1.0f);     // Draw a grid
-    EndMode3D();                // End 3d mode drawing, returns to orthographic 2d mode
-
-    DrawText("TEXT DRAWN IN RENDER TEXTURE", 200, 10, 30, RED);
+    ClearBackground(WHITE);  // Clear texture background
     EndTextureMode();               // End drawing to texture (now we have a texture available for next passes)
 
+    // THE REST OF THE GAME
     ClearBackground(RAYWHITE);  // Clear screen background
 
     // Enable shader using the custom uniform
@@ -121,12 +141,8 @@ void DrawGameplayScreen(void)
     DrawTextureRec(target.texture, (Rectangle) { 0, 0, (float)target.texture.width, (float)-target.texture.height }, (Vector2) { 0, 0 }, WHITE);
     EndShaderMode();
 
-    // Draw some 2d text over drawn texture
-    DrawText("(c) Barracks 3D model by Alberto Cano", screenWidth - 220, screenHeight - 20, 10, GRAY);
     DrawFPS(10, 10);
     
-    Vector2 pos = { 20, 10 };
-    DrawTextEx(font, "GAMEPLAY SCREEN", pos, font.baseSize*3.0f, 4, MAROON);
     DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
 }
 
