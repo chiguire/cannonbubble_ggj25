@@ -36,9 +36,9 @@ float metaball(vec2 p, float r)
 
 vec3 samplef(in vec2 uv)
 {
-	float t0 = sin(iTimeDelta * 1.9) * .46;
-	float t1 = sin(iTimeDelta * 2.4) * .49;
-	float t2 = cos(iTimeDelta * 1.4) * .57;
+	float t0 = 0.5 + sin(iTimeDelta * 1.1) * .1;
+	float t1 = 0.5 +sin(iTimeDelta * 1.2) * .24;
+	float t2 = 0.5 +cos(iTimeDelta * 1.3) * .16;
 
 	float r = 0;
 
@@ -48,9 +48,9 @@ vec3 samplef(in vec2 uv)
 
 	//r += metaball(uv - vec2(0.46, 0.57), 0.05);
 	
-	r = metaball(uv + vec2(t0, t2), .33) *
-			  metaball(uv - vec2(t0, t1), .27) *
-			  metaball(uv + vec2(t1, t2), .59);
+	r = metaball(uv - vec2(t0, t2), .04) *
+			  metaball(uv - vec2(t0, t1), .07) *
+			  metaball(uv - vec2(t1, t2), .09);
 
 	vec3 c = (r > .4 && r < .7)
 			  ? (vec3(step(.1, r*r*r)) * CE)
