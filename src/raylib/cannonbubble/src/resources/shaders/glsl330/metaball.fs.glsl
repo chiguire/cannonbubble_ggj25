@@ -16,9 +16,8 @@ uniform vec2 ballsPos[MAX_BALLS1];
 uniform float ballsRadius[MAX_BALLS1];
 uniform int ballsHowMany;
 
-uniform float renderWidth;
-uniform float renderHeight;
-uniform vec2 center;
+uniform vec2 iResolution;
+uniform vec2 iCenter;
 
 // Output fragment color
 out vec4 finalColor;
@@ -39,9 +38,11 @@ vec3 samplef(in vec2 uv)
 {
 	float r = 0;
 
-	for (int i = 0; i < ballsHowMany; i++) {
-		r += metaball(uv + ballsPos[i], ballsRadius[i]);
-	}
+	//for (int i = 0; i < ballsHowMany; i++) {
+	//	r += metaball(uv + ballsPos[i], ballsRadius[i]);
+	//}
+
+	r = metaball(uv + vec2(400, 200), 10);
 
 	vec3 c = (r > .4 && r < .7)
 			  ? (vec3(step(.1, r*r*r)) * CE)
@@ -52,12 +53,12 @@ vec3 samplef(in vec2 uv)
 
 void main()
 {
-	vec2 uv = fragTexCoord.xy;
-	//vec2 uv = (fragCoord.xy / iResolution.xy * 2. - 1.)
-	//		* vec2(iResolution.x / iResolution.y, 1) * 1.25;
-
-    vec3 col = vec3(0);
-	col += samplef(uv);
+	vec2 uv = (fragTexCoord.xy - 0.3205f) * 65;
+	
+	vec3 col = vec3(uv.x, 0, 0);
+    //vec3 col = vec3(0);
+	//col += samplef(uv);
     
-    finalColor = vec4(1, 0, 0, 1);//vec4(clamp(col, 0., 1.), 1);
+    finalColor = vec4(clamp(col, 0., 1.), 1);
+	//finalColor = vec4(1,0,0,1);
 }

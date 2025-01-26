@@ -47,7 +47,6 @@ int screenHeight = 0;
 
 GameState gameState = { 0 };
 
-Camera camera = { 0 };
 Shader shader = { 0 };
 
 int iTimeDeltaLoc = 0;
@@ -62,7 +61,13 @@ float ballsRadius[4] = { 15, 20, 25, 12 };
 int ballsHowManyLoc = 0;
 int ballsHowMany = 4;
 
-RenderTexture2D target = { 0 };
+int iResolutionLoc = 0;
+Vector2 iResolution = { 0 };
+
+int iCenterLoc = 0;
+Vector2 iCenter = { 0 };
+
+Camera2D camera = { 0 };
 
 //----------------------------------------------------------------------------------
 // Gameplay Screen Functions Definition
@@ -88,11 +93,21 @@ void InitGameplayScreen(void)
     
     ballsRadiusLoc = GetShaderLocation(shader, "ballsRadius");
 
+    ballsHowManyLoc = GetShaderLocation(shader, "ballsHowMany");
+
     screenWidth = GetScreenWidth();
     screenHeight = GetScreenHeight();
+    
+    iResolutionLoc = GetShaderLocation(shader, "iResolution");
+    iResolution = (Vector2){ (float)screenWidth, (float)screenHeight };
 
-    // Create a RenderTexture2D to be used for render to texture
-    target = LoadRenderTexture(screenWidth, screenHeight);
+    iCenterLoc = GetShaderLocation(shader, "iCenter");
+    iCenter = (Vector2){ screenWidth / 2.0f, screenHeight / 2.0f };
+
+    camera.target = (Vector2){ 0, 0 };
+    camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
 }
 
 // Gameplay Screen Update logic
@@ -106,17 +121,17 @@ void UpdateGameplayScreen(void)
     ballsPos[2] = Vector2Add((Vector2) { 40, 60 }, (Vector2) { -cosf(frameTime), sinf(frameTime*2) });
     ballsPos[3] = Vector2Add((Vector2) { -60, 55 }, (Vector2) { -cosf(frameTime*3), -sinf(frameTime*2) });
 
+    frameTime += GetFrameTime();
+
     // Press enter or tap to change to ENDING screen
     if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
     {
         finishScreen = 1;
         PlaySound(fxCoin);
     }
-    frameTime += GetFrameTime();
 }
 
-// Gameplay Screen Draw logic
-void DrawGameplayScreen(void)
+void RenderTextureGameplayScreen(void)
 {
     // METABALL RENDERING
     // Send new value to the shader to be used on drawing
@@ -125,20 +140,23 @@ void DrawGameplayScreen(void)
     SetShaderValueV(shader, ballsRadiusLoc, ballsRadius, SHADER_UNIFORM_VEC2, 4);
     SetShaderValue(shader, ballsHowManyLoc, &ballsHowMany, SHADER_UNIFORM_INT);
 
-    //----------------------------------------------------------------------------------
-    // Draw
-    //----------------------------------------------------------------------------------
-    BeginTextureMode(target);       // Enable drawing to texture
-    ClearBackground(WHITE);  // Clear texture background
-    EndTextureMode();               // End drawing to texture (now we have a texture available for next passes)
+    SetShaderValue(shader, iResolutionLoc, &iResolution, SHADER_UNIFORM_VEC2);
+    SetShaderValue(shader, iCenterLoc, &iCenter, SHADER_UNIFORM_VEC2);
+}
 
+// Gameplay Screen Draw logic
+void DrawGameplayScreen(void)
+{
     // THE REST OF THE GAME
-    ClearBackground(RAYWHITE);  // Clear screen background
+    ClearBackground(DARKPURPLE);  // Clear screen background
 
     // Enable shader using the custom uniform
     BeginShaderMode(shader);
     // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-    DrawTextureRec(target.texture, (Rectangle) { 0, 0, (float)target.texture.width, (float)-target.texture.height }, (Vector2) { 0, 0 }, WHITE);
+    // DrawTextureRec(target.texture, (Rectangle) { 0, 0, (float)target.texture.width, (float)-target.texture.height }, (Vector2) { 0, 0 }, WHITE);
+    BeginMode2D(camera);
+    DrawRectangle(screenWidth * -0.5f, screenHeight * -0.5f, screenWidth, screenHeight, WHITE);
+    EndMode2D();
     EndShaderMode();
 
     DrawFPS(10, 10);
@@ -150,6 +168,7 @@ void DrawGameplayScreen(void)
 void UnloadGameplayScreen(void)
 {
     // TODO: Unload GAMEPLAY screen variables here!
+    UnloadShader(shader);
 }
 
 // Gameplay Screen should finish?

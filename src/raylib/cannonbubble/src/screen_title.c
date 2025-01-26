@@ -65,6 +65,7 @@ void DrawTitleScreen(void)
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), GREEN);
     Vector2 pos = { 20, 10 };
     DrawTextEx(font, "CANNON BUBBLE", pos, font.baseSize*3.0f, 4, DARKGREEN);
+    DrawText("By: Ciro Duran (https://www.ciroduran.com)", 120, 190, 20, DARKGREEN);
     DrawText("PRESS ENTER or TAP to JUMP to START", 120, 220, 20, DARKGREEN);
 }
 

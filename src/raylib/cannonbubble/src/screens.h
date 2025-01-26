@@ -75,6 +75,7 @@ int FinishOptionsScreen(void);
 //----------------------------------------------------------------------------------
 void InitGameplayScreen(void);
 void UpdateGameplayScreen(void);
+void RenderTextureGameplayScreen(void);
 void DrawGameplayScreen(void);
 void UnloadGameplayScreen(void);
 int FinishGameplayScreen(void);
