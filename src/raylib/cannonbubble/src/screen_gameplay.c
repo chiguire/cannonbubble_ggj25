@@ -53,13 +53,13 @@ int iTimeDeltaLoc = 0;
 float frameTime = 0.0f;
 
 int ballsPosLoc = 0;
-Vector2 ballsPos[4] = { { -50, -50 }, { 40, -50 }, { 40, 60 }, { -60, 55 } };
+Vector2 ballsPos[4] = { { 0.46f , 0.57f }, { 0.5f, 0.55f }, { 0.4f, 0.6f }, { 0.6f, 0.7f } };
 
 int ballsRadiusLoc = 0;
-float ballsRadius[4] = { 15, 20, 25, 12 };
+float ballsRadius[4] = { 0.05, 0.09, 0.12, 0.075 };
 
 int ballsHowManyLoc = 0;
-int ballsHowMany = 4;
+int ballsHowMany = 1;
 
 int iResolutionLoc = 0;
 Vector2 iResolution = { 0 };
@@ -116,10 +116,11 @@ void UpdateGameplayScreen(void)
     // TODO: Update GAMEPLAY screen variables here!
     TickGameState(&gameState);
 
-    ballsPos[0] = Vector2Add((Vector2) { -50 , -50 }, (Vector2) { cosf(frameTime), sinf(frameTime) });
-    ballsPos[1] = Vector2Add((Vector2) { 40, -50 }, (Vector2) { cosf(frameTime*2), -sinf(frameTime) });
-    ballsPos[2] = Vector2Add((Vector2) { 40, 60 }, (Vector2) { -cosf(frameTime), sinf(frameTime*2) });
-    ballsPos[3] = Vector2Add((Vector2) { -60, 55 }, (Vector2) { -cosf(frameTime*3), -sinf(frameTime*2) });
+    ballsPos[0] = Vector2Add((Vector2) { 0.46f, 0.57f }, (Vector2) { cosf(frameTime)*0.001f, sinf(frameTime)*0.001f });
+    ballsPos[1] = Vector2Add((Vector2) { 0.5f, 0.55f }, (Vector2) { cosf(frameTime*2) * 0.001f, -sinf(frameTime) * 0.001f
+    });
+    ballsPos[2] = Vector2Add((Vector2) { 0.4f, 0.6f }, (Vector2) { -cosf(frameTime) * 0.001f, sinf(frameTime*2)*0.001f });
+    ballsPos[3] = Vector2Add((Vector2) { 0.6f, 0.7f }, (Vector2) { -cosf(frameTime*3) * 0.001f, -sinf(frameTime*2)*0.001f });
 
     frameTime += GetFrameTime();
 
